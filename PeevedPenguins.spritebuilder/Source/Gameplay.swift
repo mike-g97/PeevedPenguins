@@ -87,6 +87,9 @@ class Gameplay: CCNode, CCPhysicsCollisionDelegate {
             // follow the flying penguin
             let actionFollow = CCActionFollow(target: currentPenguin, worldBoundary: boundingBox())
             contentNode.runAction(actionFollow)
+            
+          
+            
         }
     }
     
