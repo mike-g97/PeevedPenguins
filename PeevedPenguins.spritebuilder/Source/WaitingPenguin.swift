@@ -21,4 +21,6 @@ class WaitingPenguin: CCSprite {
         // timelines can be referenced and run by name using the animation manager
         animationManager.runAnimationsForSequenceNamed("BlinkAndJump")
     }
+    
+    
 }

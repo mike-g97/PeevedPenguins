@@ -18,6 +18,8 @@ class Gameplay: CCNode, CCPhysicsCollisionDelegate {
     var mouseJoint: CCPhysicsJoint?
     var currentPenguin: Penguin?
     var penguinCatapultJoint: CCPhysicsJoint?
+    let minSpeed = CGFloat(5)
+    var actionFollow: CCActionFollow?
     
     // called when CCB file has completed loading
     func didLoadFromCCB() {
@@ -85,12 +87,19 @@ class Gameplay: CCNode, CCPhysicsCollisionDelegate {
             currentPenguin?.physicsBody.allowsRotation = true
             
             // follow the flying penguin
-            let actionFollow = CCActionFollow(target: currentPenguin, worldBoundary: boundingBox())
+            actionFollow = CCActionFollow(target: currentPenguin, worldBoundary: boundingBox())
             contentNode.runAction(actionFollow)
             
-          
-            
+             currentPenguin!.launched = true
         }
+    }
+    
+    func nextAttempt() {
+        currentPenguin = nil
+        contentNode.stopAction(actionFollow)
+        
+        let actionMoveTo = CCActionMoveTo(duration: 1, position: CGPoint.zeroPoint)
+        contentNode.runAction(actionMoveTo)
     }
     
     override func touchEnded(touch: CCTouch!, withEvent event: CCTouchEvent!) {
@@ -154,5 +163,30 @@ class Gameplay: CCNode, CCPhysicsCollisionDelegate {
                 }, key: seal)
         }
     }
+    
+    override func update(delta: CCTime) {
+        if let currentPenguin = currentPenguin {
+            if currentPenguin.launched {
+                // if speed is below minimum speed, assume this attempt is over
+                if ccpLength(currentPenguin.physicsBody.velocity) < minSpeed {
+                    nextAttempt()
+                    return
+                }
+                
+                let xMin = currentPenguin.boundingBox().origin.x
+                if (xMin < boundingBox().origin.x) {
+                    nextAttempt()
+                    return
+                }
+                
+                let xMax = xMin + currentPenguin.boundingBox().size.width
+                if xMax > (boundingBox().origin.x + boundingBox().size.width) {
+                    nextAttempt()
+                    return
+                }
+            }
+        }
+    }
+    
     
 }
